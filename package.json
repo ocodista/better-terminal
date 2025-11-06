@@ -16,6 +16,7 @@
     "dev": "bun --watch src/index.ts",
     "build": "bun run build.ts",
     "build:all": "bun run build.ts --all",
+    "deploy:prod": "wrangler deploy --env production",
     "test": "./tests/test-all.sh",
     "test:quick": "./tests/quick-test.sh",
     "test:ubuntu": "./tests/test-ubuntu.sh",
@@ -28,7 +29,8 @@
     "check": "bun run src/index.ts check"
   },
   "devDependencies": {
-    "@types/bun": "latest"
+    "@types/bun": "latest",
+    "wrangler": "^4.46.0"
   },
   "peerDependencies": {
     "typescript": "^5"
