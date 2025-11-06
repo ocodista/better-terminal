@@ -20,8 +20,8 @@ fi
 echo "📦 Starting fresh Ubuntu container..."
 docker run -d --name $CONTAINER_NAME ubuntu:22.04 tail -f /dev/null > /dev/null
 
-echo "⏳ Installing curl and sudo in container..."
-docker exec $CONTAINER_NAME bash -c "apt-get update -qq && apt-get install -y -qq curl sudo > /dev/null 2>&1"
+echo "⏳ Installing curl, sudo, and git in container..."
+docker exec $CONTAINER_NAME bash -c "apt-get update -qq && apt-get install -y -qq curl sudo git > /dev/null 2>&1"
 
 echo "🌐 Running deployed install script..."
 echo ""
@@ -46,7 +46,7 @@ if [ $? -eq 0 ]; then
 
     # Test fzf
     echo -n "  fzf: "
-    if docker exec $CONTAINER_NAME bash -c "command -v fzf" > /dev/null 2>&1; then
+    if docker exec $CONTAINER_NAME bash -c "[ -f ~/.fzf/bin/fzf ]" > /dev/null 2>&1; then
         echo "✓"
     else
         echo "✗ FAILED"
