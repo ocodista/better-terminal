@@ -1,4 +1,23 @@
-<!DOCTYPE html>
+export default {
+  async fetch(request) {
+    const url = new URL(request.url);
+
+    // Redirect /install.sh to GitHub raw file
+    if (url.pathname === '/install.sh') {
+      const scriptUrl = 'https://raw.githubusercontent.com/ocodista/better-shell/main/install.sh';
+      const response = await fetch(scriptUrl);
+      return new Response(response.body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/plain; charset=utf-8',
+          'Cache-Control': 'public, max-age=300',
+        },
+      });
+    }
+
+    // Root path - show simple landing page
+    if (url.pathname === '/') {
+      const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -26,6 +45,10 @@
         }
         a {
             color: #0066cc;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -40,4 +63,13 @@
         <a href="https://github.com/ocodista/better-shell">View on GitHub</a>
     </p>
 </body>
-</html>
+</html>`;
+      return new Response(html, {
+        headers: { 'Content-Type': 'text/html; charset=utf-8' },
+      });
+    }
+
+    // Everything else redirects to GitHub
+    return Response.redirect('https://github.com/ocodista/better-shell', 302);
+  },
+};
