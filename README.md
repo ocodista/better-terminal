@@ -5,7 +5,7 @@ One command installs a complete terminal setup with auto-suggestions, fast searc
 ## Installation
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/[user]/better-terminal/main/install.sh | bash
+curl -fsSL https://raw.githubusercontent.com/ocodista/better-terminal/main/install.sh | bash
 ```
 
 Installs in 5-10 minutes. Backs up existing configs automatically.
@@ -89,7 +89,7 @@ Backups are saved to `~/.better-terminal-backups/` before installation.
 
 ```bash
 # Clone and build
-git clone https://github.com/[user]/better-terminal.git
+git clone https://github.com/ocodista/better-terminal.git
 cd better-terminal
 bun install
 bun run build
