@@ -9,8 +9,8 @@ linker = "isolated"
 auto = true
 
 [test]
-# Root directory for tests
-root = "./tests"
+# Root directory for tests (searches recursively)
+root = "."
 
 # Preload files before tests
 # preload = []

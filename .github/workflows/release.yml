@@ -1,0 +1,78 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-release:
+    name: Build and Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run tests
+        run: bun test
+
+      - name: Build all platform binaries
+        run: bun run build:all
+
+      - name: Verify binaries exist
+        run: |
+          ls -lh dist/
+          echo "Binaries built successfully"
+
+      - name: Create checksums
+        run: |
+          cd dist
+          for file in better-shell-*; do
+            if [ -f "$file" ]; then
+              shasum -a 256 "$file" > "$file.sha256"
+            fi
+          done
+          cd ..
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release v${{ steps.version.outputs.VERSION }}
+          draft: false
+          prerelease: false
+          generate_release_notes: true
+          files: |
+            dist/better-shell-darwin-amd64
+            dist/better-shell-darwin-amd64.sha256
+            dist/better-shell-darwin-arm64
+            dist/better-shell-darwin-arm64.sha256
+            dist/better-shell-linux-amd64
+            dist/better-shell-linux-amd64.sha256
+            dist/better-shell-linux-arm64
+            dist/better-shell-linux-arm64.sha256
+            dist/better-shell-windows-amd64.exe
+            dist/better-shell-windows-amd64.exe.sha256
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Display release info
+        run: |
+          echo "Release created successfully!"
+          echo "Version: v${{ steps.version.outputs.VERSION }}"
+          echo "Tag: ${{ github.ref }}"

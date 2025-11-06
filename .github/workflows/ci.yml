@@ -1,0 +1,113 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Run type check
+        run: bun run --bun tsc --noEmit
+
+      - name: Build project
+        run: bun run build
+
+      - name: Run unit tests
+        run: bun test
+
+      - name: Run integration tests (Ubuntu only)
+        if: matrix.os == 'ubuntu-latest'
+        run: bun run test:integration
+
+  docker-test:
+    name: Docker Integration Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build binaries
+        run: bun run build:all
+
+      - name: Test Ubuntu installation
+        run: bun run test:integration:ubuntu
+        timeout-minutes: 10
+
+      - name: Test Alpine installation
+        run: bun run test:integration:alpine
+        timeout-minutes: 10
+
+  lint:
+    name: Lint and Format
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Check TypeScript types
+        run: bun run --bun tsc --noEmit
+
+  build-all-platforms:
+    name: Build All Platforms
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build all platform binaries
+        run: bun run build:all
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: binaries
+          path: dist/
+          retention-days: 7
