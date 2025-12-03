@@ -2,7 +2,18 @@ name = "better-shell"
 main = "worker.js"
 compatibility_date = "2024-01-01"
 
+# D1 Database for telemetry
+[[d1_databases]]
+binding = "DB"
+database_name = "better-shell-telemetry"
+database_id = "placeholder-create-db-first"
+
 [env.production]
 routes = [
   { pattern = "shell.ocodista.com/*", zone_name = "ocodista.com" }
 ]
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "better-shell-telemetry"
+database_id = "placeholder-create-db-first"
