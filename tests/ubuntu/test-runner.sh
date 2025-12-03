@@ -102,6 +102,25 @@ zsh -c "echo 'Zsh interactive shell loaded successfully'" || { echo "❌ zsh fai
 echo "    ✓ zsh loads correctly"
 
 echo ""
+echo "📋 Testing new CLI flags..."
+
+echo "  → Testing --dry-run flag..."
+sudo ./better-shell install --dry-run 2>&1 | grep -q "DRY RUN MODE" || { echo "❌ --dry-run not working"; exit 1; }
+echo "    ✓ --dry-run flag works"
+
+echo "  → Testing --tools flag..."
+sudo ./better-shell install --dry-run --tools fzf,eza 2>&1 | grep -q "fzf, eza" || { echo "❌ --tools not working"; exit 1; }
+echo "    ✓ --tools flag works"
+
+echo "  → Testing --no-telemetry flag..."
+sudo ./better-shell install --dry-run --no-telemetry 2>&1 | grep -q "DRY RUN MODE" || { echo "❌ --no-telemetry not working"; exit 1; }
+echo "    ✓ --no-telemetry flag works"
+
+echo "  → Testing update command..."
+sudo ./better-shell update --dry-run 2>&1 | grep -q "Updating Tools" || { echo "❌ update command not working"; exit 1; }
+echo "    ✓ update command works"
+
+echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "✅ All integration tests passed!"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"

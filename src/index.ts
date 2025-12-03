@@ -11,6 +11,7 @@ import { install } from './commands/install';
 import { check } from './commands/check';
 import { backup } from './commands/backup';
 import { restore } from './commands/restore';
+import { update } from './commands/update';
 
 const VERSION = '1.0.0';
 
@@ -31,6 +32,7 @@ ${bright}USAGE:${reset}
 
 ${bright}COMMANDS:${reset}
   ${cyan}install${reset}               Install and configure everything
+  ${cyan}update${reset}                Update already installed tools
   ${cyan}check${reset}                 Check system requirements
   ${cyan}backup${reset} [destination]  Backup existing configurations
   ${cyan}restore${reset} <backup-path> Restore from backup
@@ -38,15 +40,26 @@ ${bright}COMMANDS:${reset}
 ${bright}OPTIONS:${reset}
   --skip-backup         Skip configuration backup
   --dry-run            Preview installation without making changes
-  --interactive        Ask before each step (coming soon)
+  --interactive        Ask before each tool installation
   --minimal            Install only essentials
+  --tools <list>       Install specific tools (comma-separated)
+  --exclude <list>     Skip specific tools (comma-separated)
+  --no-telemetry       Disable anonymous usage statistics
   --version, -v        Show version
   --help, -h           Show this help
+
+${bright}AVAILABLE TOOLS:${reset}
+  zsh, oh-my-zsh, antigen, fonts, fzf, eza, carapace, asdf, nodejs, tmux, tpm
 
 ${bright}EXAMPLES:${reset}
   better-shell install
   better-shell install --skip-backup
   better-shell install --dry-run
+  better-shell install --interactive
+  better-shell install --tools fzf,eza,tmux
+  better-shell install --exclude fonts,carapace
+  better-shell update
+  better-shell update --tools fzf,tmux
   better-shell check
   better-shell backup
   better-shell backup ~/my-backups
@@ -80,6 +93,9 @@ async function main() {
       'dry-run': { type: 'boolean' },
       interactive: { type: 'boolean' },
       minimal: { type: 'boolean' },
+      tools: { type: 'string' },
+      exclude: { type: 'string' },
+      'no-telemetry': { type: 'boolean' },
     },
     allowPositionals: true,
   });
@@ -106,6 +122,17 @@ async function main() {
           dryRun: values['dry-run'] as boolean,
           interactive: values.interactive as boolean,
           minimal: values.minimal as boolean,
+          tools: values.tools as string,
+          exclude: values.exclude as string,
+          noTelemetry: values['no-telemetry'] as boolean,
+        });
+        process.exit(success ? 0 : 1);
+      }
+
+      case 'update': {
+        const success = await update({
+          tools: values.tools as string,
+          dryRun: values['dry-run'] as boolean,
         });
         process.exit(success ? 0 : 1);
       }
